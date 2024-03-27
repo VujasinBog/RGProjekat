@@ -1,0 +1,11 @@
+Model Information:
+* title:	dragon low poly
+* source:	https://sketchfab.com/3d-models/dragon-low-poly-61fc5aab46ab48d49c466343d672cfd9
+* author:	Peterb3d (https://sketchfab.com/PeterB3d)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "dragon low poly" (https://sketchfab.com/3d-models/dragon-low-poly-61fc5aab46ab48d49c466343d672cfd9) by Peterb3d (https://sketchfab.com/PeterB3d) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

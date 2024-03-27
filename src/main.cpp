@@ -56,7 +56,6 @@ struct PointLight {
 
 struct DirLight {
     glm::vec3 direction;
-
     glm::vec3 ambient;
     glm::vec3 diffuse;
     glm::vec3 specular;
@@ -291,11 +290,11 @@ int main() {
     Model witcher("resources/objects/witcher_3-geralt/scene.gltf");
     witcher.SetShaderTextureNamePrefix("material.");
 
-    Model stena1("resources/objects/rocks/scene.gltf");
-    stena1.SetShaderTextureNamePrefix("material.");
+    Model stena("resources/objects/rocks/scene.gltf");
+    stena.SetShaderTextureNamePrefix("material.");
 
-    Model stena2("resources/objects/rocks/scene.gltf");
-    stena2.SetShaderTextureNamePrefix("material.");
+    Model zmaj("resources/objects/dragon_low_poly/scene.gltf");
+    zmaj.SetShaderTextureNamePrefix("material.");
 
 
     podlogaShader.use();
@@ -399,16 +398,34 @@ int main() {
         //STENA1
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-1.5f, -10.0f, -80.0f));
-        model = glm::scale(model, glm::vec3(0.08f));
+        model = glm::scale(model, glm::vec3(0.10f));
         ourShader.setMat4("model", model);
-        stena1.Draw(ourShader);
+        stena.Draw(ourShader);
 
-        //STENE2
+        //STENA2
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-1.5f, -12.0f, 80.0f));
+        model = glm::translate(model, glm::vec3(-1.5f, -10.0f, 60.0f));
+        model = glm::scale(model, glm::vec3(0.11f));
+        ourShader.setMat4("model", model);
+        stena.Draw(ourShader);
+
+        //stena3
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(41.0f, -11.0f, 1.0f));
         model = glm::scale(model, glm::vec3(0.05f));
         ourShader.setMat4("model", model);
-        stena2.Draw(ourShader);
+        stena.Draw(ourShader);
+
+        //zmaj
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(-30.0f, -8.61f, -7.0f));
+        model = glm::rotate(model,glm::radians(-90.0f),glm::vec3(1.0,0.0,0.0));
+        model = glm::rotate(model,glm::radians(90.0f),glm::vec3(0.0,0.0,1.0));
+        model = glm::scale(model, glm::vec3(0.6f));
+
+        ourShader.setMat4("model", model);
+        zmaj.Draw(ourShader);
+
 
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
         skyboxShader.use();

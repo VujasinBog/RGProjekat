@@ -303,14 +303,14 @@ int main() {
     glBindVertexArray(0);
 
     PointLight& pointLight = programState->pointLight;
-    pointLight.position = glm::vec3(4.0f, 4.0, 0.0);
+    pointLight.position = glm::vec3(-104.0f, -104.0, 100.0);
     pointLight.ambient = glm::vec3(0.4, 0.4, 0.4);
     pointLight.diffuse = glm::vec3(1.0, 1.0, 1.0);
     pointLight.specular = glm::vec3(1.0, 1.0, 1.0);
 
-    pointLight.constant = 1.0f;
-    pointLight.linear = 0.0f;
-    pointLight.quadratic = 0.0f;
+    pointLight.constant = 0.6f;
+    pointLight.linear = 0.5f;
+    pointLight.quadratic = 0.5f;
 
 
 
@@ -327,10 +327,10 @@ int main() {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        dirLight.direction = glm::vec3(-2.0f, -1.0f, -0.3f);
-        dirLight.ambient = glm::vec3(0.5f, 0.5f, 0.5f);
-        dirLight.diffuse = glm::vec3(1, 0.8, 0.8f);
-        dirLight.specular = glm::vec3(0.5f, 0.5f, 0.5f);
+        dirLight.direction = glm::vec3(-2.0f, -2.0f, 0.3f);
+        dirLight.ambient = glm::vec3(0.7f, 0.7f, 0.7f);
+        dirLight.diffuse = glm::vec3(1.0, 1.0, 1.0);
+        dirLight.specular = glm::vec3(0.2f, 0.2f, 0.2f);
 
         // input
         // -----
@@ -370,6 +370,13 @@ int main() {
         // don't forget to enable shader before setting uniforms
         ourShader.use();
        // pointLight.position = glm::vec3(4.0 * cos(currentFrame), 4.0f, 4.0 * sin(currentFrame));
+        ourShader.setVec3("dirLight.direction", dirLight.direction);
+        ourShader.setVec3("dirLight.ambient", dirLight.ambient);
+        ourShader.setVec3("dirLight.diffuse", dirLight.diffuse);
+        ourShader.setVec3("dirLight.specular", dirLight.specular);
+        ourShader.setFloat("shininess", 32.0f);
+
+
         ourShader.setVec3("pointLight.position", pointLight.position);
         ourShader.setVec3("pointLight.ambient", pointLight.ambient);
         ourShader.setVec3("pointLight.diffuse", pointLight.diffuse);
@@ -387,12 +394,12 @@ int main() {
         ourShader.setMat4("view", view);
 
         // WITCHER
-        glm::mat4 model1 = glm::mat4(1.0f);
-        model1 = glm::translate(model1,
+        model = glm::mat4(1.0f);
+        model = glm::translate(model,
                                programState->backpackPosition); // translate it down so it's at the center of the scene
-        model1 = glm::rotate(model1,glm::radians(-100.0f),glm::vec3(1.0,0.7,0.65));
-        model1 = glm::scale(model1, glm::vec3(programState->backpackScale));    // it's a bit too big for our scene, so scale it down
-        ourShader.setMat4("model", model1);
+        model = glm::rotate(model,glm::radians(-100.0f),glm::vec3(1.0,0.7,0.65));
+        model = glm::scale(model, glm::vec3(programState->backpackScale));    // it's a bit too big for our scene, so scale it down
+        ourShader.setMat4("model", model);
         witcher.Draw(ourShader);
 
         //STENA1
@@ -406,6 +413,7 @@ int main() {
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-1.5f, -10.0f, 60.0f));
         model = glm::scale(model, glm::vec3(0.11f));
+        ourShader.setVec3("dirLight.direction", -1.0f*dirLight.direction);
         ourShader.setMat4("model", model);
         stena.Draw(ourShader);
 
@@ -423,6 +431,9 @@ int main() {
         model = glm::rotate(model,glm::radians(90.0f),glm::vec3(0.0,0.0,1.0));
         model = glm::scale(model, glm::vec3(0.6f));
 
+        ourShader.setVec3("dirLight.direction", -1.0f*dirLight.direction);
+
+        ourShader.setFloat("shininess", 32.0f);
         ourShader.setMat4("model", model);
         zmaj.Draw(ourShader);
 

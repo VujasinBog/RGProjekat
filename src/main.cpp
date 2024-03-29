@@ -66,7 +66,7 @@ struct ProgramState {
     bool ImGuiEnabled = false;
     Camera camera;
     bool CameraMouseMovementUpdateEnabled = true;
-    glm::vec3 backpackPosition = glm::vec3(-11.0f);
+    glm::vec3 witcherPosition = glm::vec3(-11.0f);
     float backpackScale = 0.7f;
     PointLight pointLight;
     DirLight dirLight;
@@ -303,14 +303,14 @@ int main() {
     glBindVertexArray(0);
 
     PointLight& pointLight = programState->pointLight;
-    pointLight.position = glm::vec3(-104.0f, -104.0, 100.0);
-    pointLight.ambient = glm::vec3(0.4, 0.4, 0.4);
+    pointLight.position = glm::vec3(-11.0,-10.3,-11.0);
+    pointLight.ambient = glm::vec3(0.1, 0.1, 0.1);
     pointLight.diffuse = glm::vec3(1.0, 1.0, 1.0);
     pointLight.specular = glm::vec3(1.0, 1.0, 1.0);
 
-    pointLight.constant = 0.6f;
-    pointLight.linear = 0.5f;
-    pointLight.quadratic = 0.5f;
+    pointLight.constant = 0.7f;
+    pointLight.linear = 0.999999f;
+    pointLight.quadratic = 0.999999f;
 
 
 
@@ -328,8 +328,8 @@ int main() {
         lastFrame = currentFrame;
 
         dirLight.direction = glm::vec3(-2.0f, -2.0f, 0.3f);
-        dirLight.ambient = glm::vec3(0.7f, 0.7f, 0.7f);
-        dirLight.diffuse = glm::vec3(1.0, 1.0, 1.0);
+        dirLight.ambient = glm::vec3(0.81f, 0.81f, 0.81f);
+        dirLight.diffuse = glm::vec3(1.0f, 1.0f, 1.0f);
         dirLight.specular = glm::vec3(0.2f, 0.2f, 0.2f);
 
         // input
@@ -396,7 +396,7 @@ int main() {
         // WITCHER
         model = glm::mat4(1.0f);
         model = glm::translate(model,
-                               programState->backpackPosition); // translate it down so it's at the center of the scene
+                               programState->witcherPosition); // translate it down so it's at the center of the scene
         model = glm::rotate(model,glm::radians(-100.0f),glm::vec3(1.0,0.7,0.65));
         model = glm::scale(model, glm::vec3(programState->backpackScale));    // it's a bit too big for our scene, so scale it down
         ourShader.setMat4("model", model);
@@ -413,7 +413,7 @@ int main() {
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-1.5f, -10.0f, 60.0f));
         model = glm::scale(model, glm::vec3(0.11f));
-        ourShader.setVec3("dirLight.direction", -1.0f*dirLight.direction);
+      //  ourShader.setVec3("dirLight.direction", 1.0f*dirLight.direction);
         ourShader.setMat4("model", model);
         stena.Draw(ourShader);
 
@@ -535,7 +535,7 @@ void DrawImGui(ProgramState *programState) {
         ImGui::Text("Hello text");
         ImGui::SliderFloat("Float slider", &f, 0.0, 1.0);
         ImGui::ColorEdit3("Background color", (float *) &programState->clearColor);
-        ImGui::DragFloat3("Backpack position", (float*)&programState->backpackPosition);
+        ImGui::DragFloat3("Backpack position", (float*)&programState->witcherPosition);
         ImGui::DragFloat("Backpack scale", &programState->backpackScale, 0.05, 0.1, 4.0);
 
         ImGui::DragFloat("pointLight.constant", &programState->pointLight.constant, 0.05, 0.0, 1.0);

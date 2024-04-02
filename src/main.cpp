@@ -27,6 +27,7 @@ void processInput(GLFWwindow *window);
 void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 
 unsigned int loadTexture(char const *path);
+unsigned int loadTexture2(char const *path);
 unsigned int loadCubemap(vector<std::string> faces);
 
 // settings
@@ -170,10 +171,20 @@ int main() {
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
 
+
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
+    glEnable(GL_BLEND);
+
+
+
     // build and compile shaders
     // -------------------------
     Shader ourShader("resources/shaders/2.model_lighting.vs", "resources/shaders/2.model_lighting.fs");
     Shader podlogaShader("resources/shaders/podlogaShader.vs","resources/shaders/podlogaShader.fs");
+    Shader bushShader("resources/shaders/bushShader.vs", "resources/shaders/bushShader.fs");
     Shader skyboxShader("resources/shaders/skyboxShader.vs", "resources/shaders/skyboxShader.fs");
 
     float planeVertices[] = {
@@ -209,7 +220,7 @@ int main() {
 
     glBindVertexArray(0);
 
-    unsigned int podlogaTexture = loadTexture("resources/textures/green-grass.jpg");
+    unsigned int podlogaTexture = loadTexture2("resources/textures/green-grass.jpg");
     podlogaShader.use();
     podlogaShader.setInt("texture1", 0);
 
@@ -285,6 +296,66 @@ int main() {
     stbi_set_flip_vertically_on_load(true);
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);
+
+    float bushVertices2[] = {
+            // positions         // texture Coords (swapped y coordinates because texture is flipped upside down)
+            0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
+            0.0f, -0.5f,  0.0f,  0.0f,  1.0f,
+            1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
+
+            0.0f,  0.5f,  0.0f,  0.0f,  0.0f,
+            1.0f, -0.5f,  0.0f,  1.0f,  1.0f,
+            1.0f,  0.5f,  0.0f,  1.0f,  0.0f
+    };
+
+    float bushVertices[] = {
+            // positions          texture        normal
+            0.0f,  0.5f,  0.0f,  0.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+            0.0f, -0.5f,  0.0f,  0.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+            1.0f, -0.5f,  0.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+
+            0.0f,  0.5f,  0.0f,  0.0f,  0.0f,  0.0f,  1.0f,  0.0f,
+            1.0f, -0.5f,  0.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f,
+            1.0f,  0.5f,  0.0f,  1.0f,  0.0f,   0.0f,  1.0f,  0.0f
+    };
+
+
+    glm::vec3 bushPozicije[] = {
+            glm::vec3(-19.0f, -10.8f, 13.0f),
+            glm::vec3(-10.5f, -10.8f, -10.5f),
+            glm::vec3(-5.0f, -10.8f, -12.0f),
+            glm::vec3(-11.0f, -10.8f, -1.0f),
+            glm::vec3(-1.0f, -10.8f, 15.0f),
+            glm::vec3(-13.5f, -10.8f, -1.5f),
+            glm::vec3(-6.0f, -10.8f, -6.0f),
+            glm::vec3(-16.0f, -10.8f, -12.0f),
+
+    };
+
+    unsigned int bushVAO, bushVBO;
+    glGenVertexArrays(1, &bushVAO);
+    glGenBuffers(1, &bushVBO);
+    glBindVertexArray(bushVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, bushVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(bushVertices), bushVertices, GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    glBindVertexArray(0);
+
+
+
+    stbi_set_flip_vertically_on_load(false);
+    unsigned int bushTexture = loadTexture("resources/textures/pngwing.com.png");
+    stbi_set_flip_vertically_on_load(true);
+
+
     // load models
     // -----------
     Model witcher("resources/objects/witcher_3-geralt/scene.gltf");
@@ -437,6 +508,34 @@ int main() {
         ourShader.setMat4("model", model);
         zmaj.Draw(ourShader);
 
+        glDisable(GL_CULL_FACE);
+        glBindVertexArray(bushVAO);
+        glBindTexture(GL_TEXTURE_2D, bushTexture);
+
+        bushShader.use();
+        bushShader.setInt("texture1", 0);
+        bushShader.setMat4("projection", projection);
+        bushShader.setMat4("view", view);
+
+        bushShader.setVec3("dirLight.direction", dirLight.direction);
+        bushShader.setVec3("dirLight.ambient", dirLight.ambient);
+        bushShader.setVec3("dirLight.diffuse", dirLight.diffuse);
+        bushShader.setVec3("dirLight.specular", dirLight.specular);
+        bushShader.setFloat("shininess", 32.0f);
+
+
+
+        for(int i = 0; i < 8; i++) {
+            model = glm::mat4(1.0f);
+            model = glm::rotate(model, glm::radians(-60.0f), glm::vec3(0, 1, 0));
+            model = glm::translate(model, bushPozicije[i]);
+            model = glm::scale(model, glm::vec3(0.8f));
+            bushShader.use();
+            bushShader.setMat4("model", model);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+        }
+        glEnable(GL_CULL_FACE);
+
 
         glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
         skyboxShader.use();
@@ -446,7 +545,6 @@ int main() {
         // skybox cube
         glBindVertexArray(skyboxVAO);
         glActiveTexture(GL_TEXTURE0);
-
         glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTextureDay);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
@@ -586,7 +684,43 @@ unsigned int loadTexture(char const *path) {
             format = GL_RGBA;
 
         glBindTexture(GL_TEXTURE_2D, textureID);
-        glTexImage2D(GL_TEXTURE_2D, 0, format, 4000, 4000, 0, format, GL_UNSIGNED_BYTE, data);
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        stbi_image_free(data);
+    }
+    else {
+        std::cout << "Texture failed to load at path: " << path << std::endl;
+        stbi_image_free(data);
+    }
+
+    return textureID;
+}
+
+
+unsigned int loadTexture2(char const *path) {
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+
+    int width, height, nrComponents;
+    unsigned char *data = stbi_load(path, &width, &height, &nrComponents, 0);
+    if (data) {
+        GLenum format;
+        if (nrComponents == 1)
+            format = GL_RED;
+        else if (nrComponents == 3)
+            format = GL_RGB;
+        else if (nrComponents == 4)
+            format = GL_RGBA;
+
+        glBindTexture(GL_TEXTURE_2D, textureID);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, format,4000, 4000, 0, format, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
